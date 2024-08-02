@@ -110,7 +110,7 @@ const token = async (req, res) => {
               });
             }
             console.log("User inserted successfully!", result.insertId);
-            user.user_id = result.insertId;
+            user.user_id = userid;
             const token = jwt.sign({ user }, googleConfig.tokenSecret, {
               expiresIn: googleConfig.tokenExpiration,
             });

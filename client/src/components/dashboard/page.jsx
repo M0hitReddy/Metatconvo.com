@@ -16,7 +16,7 @@ import { useContext, useEffect, useMemo, useRef } from 'react';
 // import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 export default function Dashboard() {
-  const socket = useMemo(() => io('http://localhost:5000'), []);
+  // const socket = useMemo(() => io('http://localhost:5000'), []);
   const layout = cookies.get("react-resizable-panels:layout")
   const collapsed = cookies.get("react-resizable-panels:collapsed")
   const defaultLayout = layout && layout.value ? JSON.parse(layout.value) : undefined;
@@ -40,9 +40,20 @@ export default function Dashboard() {
   //     // window.location.assign('http://localhost:5000/auth/url')
   //   }
   // },[loggedIn]);
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
+  // useEffect(() => {
+  //   if(!user){
+  //     return;
+  //   }
+  //   try {
+      
+  //     dispatch({ type: 'SET_SOCKET', payload: socket })
+ 
+  //   }
+  //   catch (err) {
+  //     console.error(err);
+  //   }
+  //   console.log(user);
+  // }, []);
   // useEffect(() => {
   //   dispatch({ type: 'SELECT_CHAT', payload: null });
   //   console.log('selected chat')
@@ -53,7 +64,7 @@ export default function Dashboard() {
       {/* <div className="hidden flex-col md:flex"> */}
       {/* <ChatsProvider> */}
       {user && <Chats
-        socket={socket}
+        // socket={socket}
         accounts={accounts}
         mails={mails}
         defaultLayout={defaultLayout}

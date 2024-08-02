@@ -5,7 +5,7 @@ export const createConversation = async (req, res) => {
   // if already exists, return
   // else create
   const { members } = req.body;
-  console.log(req.body, "members");
+  // console.log(req.body, "members");
   let convoName = "";
   const sortedMembers = members.sort();
   sortedMembers.forEach((member) => {
@@ -83,6 +83,7 @@ export const getConversations = async (req, res) => {
      WHERE m1.conversation_id = uc.conversation_id 
      ORDER BY m1.message_id DESC 
      LIMIT 1) AS last_message_content,
+     
      (SELECT m1.sender_id 
      FROM message m1 
      WHERE m1.conversation_id = uc.conversation_id 
@@ -134,7 +135,7 @@ WHERE
         .json({ success: false, message: "Error fetching conversations" });
     }
     console.log("fetched successfully!");
-    console.log(result);
+    // console.log(result);
     return res.status(200).json({
       success: true,
       message: "fetched successfully",
@@ -168,7 +169,7 @@ ON
           .json({ success: false, message: "Error fetching conversation" });
       }
       console.log("fetched successfully!");
-      console.log(p2result);
+      // console.log(p2result);
       connection.query(query, [p1, p2], (err, result) => {
         if (err) {
           console.log(err);
@@ -176,11 +177,22 @@ ON
             .status(500)
             .json({ success: false, message: "Error fetching conversation" });
         }
-        console.log("fetched convID successfully!", result);
-        console.log({
-          ...p2result[0],
-          conversation_id: result[0].conversation_id,
-        });
+        if (result.length === 0) {
+          console.log("No conversation found");
+          return res.status(200).json({
+            success: true,
+            message: "No conversation found",
+            conversation: {
+            ...p2result[0],
+            conversation_id: null,
+          },
+          });
+        }
+        // console.log("fetched convID successfully!", result);
+        // console.log({
+        //   ...p2result[0],
+        //   conversation_id: result,
+        // });
         return res.status(200).json({
           success: true,
           message: "fetched successfully",
@@ -205,7 +217,7 @@ export const getMessages = async (req, res) => {
         .json({ success: false, message: "Error fetching messages" });
     }
     console.log("fetched successfully!");
-    console.log(result);
+    // console.log(result);
     return res.status(200).json({
       success: true,
       message: "fetched successfully",

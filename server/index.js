@@ -33,8 +33,8 @@ app.use(express.json());
 
 
 io.on('connection', (socket) => {
-    setEvents(socket);
-    // console.log('a user connected');
+    setEvents(socket, io);
+    console.log('a user connected');
 
 
 });

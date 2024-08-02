@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/tooltip";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useChats } from "./ChatsContext";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
 import { set } from "date-fns";
@@ -47,11 +47,13 @@ import {
   Forward,
   MoreVertical,
 } from "lucide-react";
+import { useSocket } from "./SocketContext";
 
 export function ChatDisplay() {
   const { user } = useContext(AuthContext);
   const { user_id } = useParams();
   const { state, dispatch } = useChats();
+  const {socket, sendMessage} = useSocket();
   const messagesEndRef = useRef(null);
   const [message, setMessage] = useState("");
   const [showInput, setShowInput] = useState(false);
@@ -61,10 +63,17 @@ export function ChatDisplay() {
     // if (!state.selectedChat || !state.selectedChat.messages) return;
     console.log(state.messages);
     if (state.messages.length != 0) setShowInput(true);
+    // else setShowInput(false);
   }, [state.selectedChat, state.messages]);
 
   useEffect(() => {
     console.log(user_id);
+    dispatch({
+      type: "SET_MESSAGES",
+      payload: [],
+    });
+    setShowInput(false);
+    
     if (!user_id) return;
     (async () => {
       try {
@@ -81,29 +90,38 @@ export function ChatDisplay() {
     })();
   }, [state.chats, user_id]);
 
+  useLayoutEffect(() => {
+      // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current?.scrollIntoView({ block: 'end' });
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({behavior: 'smooth', block: 'end' });
+      }, 200);
+      // messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [user_id, showInput]);
   useEffect(() => {
-    console.log(state.messages);
-    // if(state.selectedChat) return;
-    // if (state.messages[state.messages.length - 1]?.sender_id === user.user_id)
+
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [state.messages, user_id]);
+  }, [state.messages.length]);
 
   useEffect(() => {
-    console.log(state.socket);
-    if (!state.socket) return;
-    state.socket.on("receive-message", (data) => {
-      console.log("cheem tapak dam dam", data);
-      // state.socket.emit("message-received", data);
-      console.log(data);
-      if (data.sender_id !== data.receiver_id) {
-        // state.socket.emit("message-received", data);
-        dispatch({ type: "ADD_MESSAGE", payload: data });
-      }
-    });
-  }, [state.socket]);
+    console.log(socket);
+    if (!socket) return;
+    // socket.on("receive-message", (data) => {
+    //   console.log("cheem tapak dam dam", data, data.sender_id == user_id);
+    //   // socket.emit("message-received", data);
+    //   console.log(data);
+    //   if (data.sender_id !== data.receiver_id && data.sender_id == user_id) {
+    //     // socket.emit("message-received", data);
+    //     dispatch({ type: "ADD_MESSAGE", payload: data });
+    //   }
+    // });
+  }, [socket]);
 
   useEffect(() => {
-    if (!state.selectedChat || !state.selectedChat.conversation_id) return;
+    if (!state.selectedChat || !state.selectedChat.conversation_id) {
+      // dispatch({ type: "SET_MESSAGES", payload: [] });
+      return
+    };
     // console.log('fetching messages')
     (async () => {
       try {
@@ -123,6 +141,7 @@ export function ChatDisplay() {
           //   sentAt: data.sent_at,
           // },
         });
+        // if(state.messages.length == 0) setShowInput(false);
       } catch (error) {
         console.error(error);
       }
@@ -132,6 +151,7 @@ export function ChatDisplay() {
   const handleStartChat = async () => {
     try {
       console.log("start chat", user_id, user.user_id);
+      setShowInput(true);
       // dispatch({ type: "SET_MESSAGES", payload: [] });
       const res = await axios.post(
         "http://localhost:5000/chats/conversation",
@@ -146,7 +166,7 @@ export function ChatDisplay() {
           conversation_id: res.data.conversation_id,
         },
       });
-      setShowInput(true);
+      // setShowInput(true);
     } catch (error) {
       console.error(error);
     }
@@ -170,9 +190,11 @@ export function ChatDisplay() {
       console.log(formatDate(new Date()));
       setMessage("");
       dispatch({ type: "ADD_MESSAGE", payload: newMessage });
+
       // const res = await axios.post('http://localhost:5000/chats/message', newMessage)
       // console.log(res.data);
-      state.socket.emit("send-message", newMessage);
+      // socket.emit("send-message", newMessage);
+      sendMessage(newMessage);
       // console.log('set message')
       // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
       // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -256,8 +278,8 @@ export function ChatDisplay() {
             <React.Fragment>
               <div className="flex-grow"></div>
               {/* <div>hjhjvhv</div> */}
-              <ScrollArea className="h-scree flex flex-col h- justify-end ">
-                <div className="flex flex-col flex-grow overflow-y-auto justify-end gap-3   whitespace-pre-wrap p-4 text-sm">
+              <ScrollArea className="h-scree flex flex-col h- justify-end " >
+                <div className="flex flex-col flex-grow overflow-y-auto justify-end gap-3   whitespace-pre-wrap p-4 text-sm" >
                   {/* <div className="flex-grow"/> */}
                   {state.messages.map((message, index) => (
                     <div
@@ -266,7 +288,7 @@ export function ChatDisplay() {
                         user.user_id === message.sender_id
                           ? "self-end border border-primary rounded-tr-none"
                           : "self-start shadow-lg bg-secondary rounded-tl-none"
-                      } relative text-left min-w-16 max-w-full sm:max-w-[90%] md:max-w-[70%] break-words flex flex-col justify-end gap-1 w-auto px-3 py-2 rounded-xl `}
+                      } relative text-left min-w-16 max-w-full sm:max-w-[90%] md:max-w-[70%] break-words flex flex-col justify-end gap-1 w-auto px-3 pt-2 pb- rounded-xl `}
                     >
                       {/* <div className="flex"> */}
                       <p
@@ -283,9 +305,10 @@ export function ChatDisplay() {
                       <p className="self-end w-max  text-muted-foreground text-xs leading3 tracking-tight self-end">
                         {getTime(message.sender_id == user.user_id ? message.sent_at : message.received_at)}
                       </p>
-                      <div ref={index + 1 === state.messages.length ? messagesEndRef : null} ></div>
+                      {/* <div ref={index + 1 === state.messages.length ? messagesEndRef : null} ></div> */}
                     </div>
                   ))}
+                  <div ref={messagesEndRef} ></div>
                 </div>
                 <ScrollBar />
               </ScrollArea>

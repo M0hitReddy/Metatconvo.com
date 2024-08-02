@@ -15,6 +15,7 @@ const AuthContextProvider = ({ children }) => {
             console.log(user)
             // socket = useMemo(() => io('http://localhost:5000'), []);
             user && setUser(user)
+            console.log(user);
         } catch (err) {
             console.error(err)
         }

@@ -122,43 +122,43 @@ export function Chats({
   // React.useEffect(() => {
   //   checkLoginState()
   // }, [checkLoginState])
-  React.useEffect(() => {
-    console.log(user)
-    // dispatch({ type: 'SELECT_CHAT', payload: null });
+  // React.useEffect(() => {
+  //   console.log(user)
+  //   // dispatch({ type: 'SELECT_CHAT', payload: null });
 
-    //   checkLoginState()
-  }, [])
-  React.useEffect(() => {
-    // if (!loggedIn) navigate('/login')
-    // console.log(user.)
-  }, [loggedIn, checkLoginState, navigate]);
-  React.useEffect(() => {
-    console.log('chats')
-    // if (state.user === null) return;
-    async function setState() {
-      try {
+  //   //   checkLoginState()
+  // }, [])
+  // React.useEffect(() => {
+  //   // if (!loggedIn) navigate('/login')
+  //   // console.log(user.)
+  // }, [loggedIn, checkLoginState, navigate]);
+  // React.useEffect(() => {
+  //   console.log('chats')
+  //   // if (state.user === null) return;
+  //   // async function setState() {
+  //     try {
       
-        dispatch({ type: 'SET_SOCKET', payload: socket })
+  //       dispatch({ type: 'SET_SOCKET', payload: socket })
    
-      }
-      catch (err) {
-        console.error(err);
-      }
-    }
-    setState();
-  }, []);
-  React.useEffect(() => {
-    if(!user.user_id) return;
-    socket.on('connect', () => {
-      console.log(user.id, "initially connected");
-      socket.emit('join', user.user_id);
-      console.log('Connected to the server', socket.id);
-    });
-    return () => {
-      socket.disconnect();
-    }
+  //     }
+  //     catch (err) {
+  //       console.error(err);
+  //     }
+  //   // }
+  //   // setState();
+  // }, []);
+  // React.useEffect(() => {
+  //   if(!state.socket) return;
+  //   socket.on('connect', () => {
+  //     console.log(user.id, "initially connected");
+  //     socket.emit('join', user.user_id);
+  //     console.log('Connected to the server', socket.id);
+  //   });
+  //   return () => {
+  //     socket.disconnect();
+  //   }
 
-  }, [user.user_id])
+  // }, [])
  
   React.useEffect(() => {
     console.log('state.selectedChat', state.selectedChat)
