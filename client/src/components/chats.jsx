@@ -116,6 +116,8 @@ export function Chats({
   const { loggedIn, checkLoginState, user } = React.useContext(AuthContext);
   const { state, dispatch } = useChats();
   const { theme, setTheme } = useTheme();
+  const [search, setSearch] = React.useState('');
+
   // const [chat] = useChat(null);
   const today = new Date()
   const navigate = useNavigate();
@@ -163,6 +165,15 @@ export function Chats({
   React.useEffect(() => {
     console.log('state.selectedChat', state.selectedChat)
   }, [state.selectedChat]);
+
+  React.useEffect(() => {
+
+  }, [search]);
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  }
+
 
   const handleLogout = async () => {
     try {
@@ -422,15 +433,15 @@ export function Chats({
               <form>
                 <div className="relative">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Search" className="pl-8" />
+                  <Input placeholder="Search" value={search} onChange={(e) => handleSearchChange(e)} className="pl-8" />
                 </div>
               </form>
             </div>
             <TabsContent value="all" className="m-0">
-              <MailList items={state.chats} />
+              <MailList search={search} items={state.chats} />
             </TabsContent>
             <TabsContent value="unread" className="m-0">
-              <MailList items={state.chats.filter((item) => !item.read)} />
+              <MailList search={search} items={state.chats.filter((item) => !item.read)} />
             </TabsContent>
           </Tabs>
         </ResizablePanel>

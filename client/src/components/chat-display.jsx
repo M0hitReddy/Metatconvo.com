@@ -248,7 +248,7 @@ export function ChatDisplay() {
                 </AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
-                <div className="font-semibold ">
+                <div className="font-bold text-lg">
                   {state.selectedChat.username}
                 </div>
               </div>
@@ -278,7 +278,7 @@ export function ChatDisplay() {
             <React.Fragment>
               <div className="flex-grow"></div>
               {/* <div>hjhjvhv</div> */}
-              <ScrollArea className="h-scree flex flex-col h- justify-end " >
+              <ScrollArea className="h-scree mr-1 flex flex-col h- justify-end " >
                 <div className="flex flex-col flex-grow overflow-y-auto justify-end gap-3   whitespace-pre-wrap p-4 text-sm" >
                   {/* <div className="flex-grow"/> */}
                   {state.messages.map((message, index) => (
@@ -288,21 +288,21 @@ export function ChatDisplay() {
                         user.user_id === message.sender_id
                           ? "self-end border border-primary rounded-tr-none"
                           : "self-start shadow-lg bg-secondary rounded-tl-none"
-                      } relative text-left min-w-16 max-w-full sm:max-w-[90%] md:max-w-[70%] break-words flex flex-col justify-end gap-1 w-auto px-3 pt-2 pb- rounded-xl `}
+                      } relative text-lef  max-w-full sm:max-w-[90%] md:max-w-[70%] break-words flex flex-col gap-1 w-auto px-2 pt-1 pb-1 rounded-xl `}
                     >
                       {/* <div className="flex"> */}
                       <p
-                        className={`text-primary${
+                        className={`text-primary-${
                           user.user_id === message.sender_id
-                            ? "-background"
-                            : "-background"
-                        } text-md font-medium leading- tracking-wide subpixel-antialiased`}
+                            ? "background"
+                            : "background"
+                        } self-${user.user_id === message.sender_id ? "end" : "start"} text-base font-medium leading-  tracking-wide subpixel-antialiased`}
                       >
                         {message.content}
                       </p>
                       {/* <p className="pe-14 h-1"></p> */}
                       {/* </div> */}
-                      <p className="self-end w-max  text-muted-foreground text-xs leading3 tracking-tight self-end">
+                      <p className="text-muted-foreground text-xs leading3 tracking-tight self-end">
                         {getTime(message.sender_id == user.user_id ? message.sent_at : message.received_at)}
                       </p>
                       {/* <div ref={index + 1 === state.messages.length ? messagesEndRef : null} ></div> */}

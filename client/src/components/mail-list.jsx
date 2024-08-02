@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 // import { c } from "vite/dist/node/types.d-aGj9QkWt"
 
-export function MailList() {
+export function MailList({search}) {
   // const [chat, setChat] = useChat()
   const navigate = useNavigate();
   const { state, dispatch } = useChats();
@@ -59,7 +59,7 @@ export function MailList() {
   return (
     <ScrollArea className="h-screen">
       <div className="flex flex-col gap-2 p-4 pt-0">
-        {state.chats.map((item) => (
+        {state.chats.filter((item) => item.username.toLowerCase().includes(search.toLowerCase())).map((item) => (
           <button
             key={item.user_id}
             className={cn(
@@ -113,7 +113,9 @@ export function MailList() {
               </div>
             </div>
           </button>
+          
         ))}
+        
       </div>
     </ScrollArea>
   );
