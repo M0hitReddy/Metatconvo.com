@@ -42,8 +42,32 @@ const SocketProvider = ({ children }) => {
         console.log(data);
         // if (data.sender_id !== data.receiver_id && data.sender_id == user_id) {
         // socket.emit("message-received", data);
-        if (data.conversation_id == state.selectedChat?.conversation_id) 
-        dispatch({ type: "ADD_MESSAGE", payload: data });
+        if (data.conversation_id == state.selectedChat?.conversation_id)
+          dispatch({ type: "ADD_MESSAGE", payload: data });
+        // let chat = state.chats.filter(
+        //   (chat) => chat.conversation_id == data.conversation_id
+        // )[0];
+        // chat = {
+        //   ...chat,
+        //   last_message_content: data.content,
+        //   last_message_time: data.received_at,
+        // };
+        // console.log("chat", chat, data);
+        dispatch({
+          type: "SET_CHATS",
+          payload: [
+            {
+              ...state.chats.filter(
+                (chat) => chat.conversation_id == data.conversation_id
+              )[0],
+              last_message_content: data.content,
+              last_message_time: data.received_at,
+            },
+            ...state.chats.filter(
+              (chat) => chat.conversation_id !== data.conversation_id
+            ),
+          ],
+        });
         // }
       });
     }
@@ -56,6 +80,30 @@ const SocketProvider = ({ children }) => {
   const sendMessage = (message) => {
     if (socket) {
       socket.emit("send-message", message);
+      // let chat = state.chats.filter(
+      //   (chat) => chat.conversation_id == message.conversation_id
+      // )[0];
+      // chat = {
+      //   ...chat,
+      //   last_message_content: message.content,
+      //   last_message_time: message.received_at,
+      // };
+      // console.log("chat", chat, data);
+      dispatch({
+        type: "SET_CHATS",
+        payload: [
+          {
+            ...state.chats.filter(
+              (chat) => chat.conversation_id == message.conversation_id
+            )[0],
+            last_message_content: message.content,
+            last_message_time: message.received_at,
+          },
+          ...state.chats.filter(
+            (chat) => chat.conversation_id !== message.conversation_id
+          ),
+        ],
+      });
     }
   };
 

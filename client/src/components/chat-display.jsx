@@ -30,7 +30,13 @@ import {
 } from "@/components/ui/tooltip";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useChats } from "./ChatsContext";
-import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
 import { set } from "date-fns";
@@ -53,7 +59,7 @@ export function ChatDisplay() {
   const { user } = useContext(AuthContext);
   const { user_id } = useParams();
   const { state, dispatch } = useChats();
-  const {socket, sendMessage} = useSocket();
+  const { socket, sendMessage } = useSocket();
   const messagesEndRef = useRef(null);
   const [message, setMessage] = useState("");
   const [showInput, setShowInput] = useState(false);
@@ -73,7 +79,7 @@ export function ChatDisplay() {
       payload: [],
     });
     setShowInput(false);
-    
+
     if (!user_id) return;
     (async () => {
       try {
@@ -88,19 +94,21 @@ export function ChatDisplay() {
         console.error(error);
       }
     })();
-  }, [state.chats, user_id]);
+  }, [user_id]);
 
   useLayoutEffect(() => {
-      // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      messagesEndRef.current?.scrollIntoView({ block: 'end' });
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({behavior: 'smooth', block: 'end' });
-      }, 200);
-      // messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ block: "end" });
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }, 200);
+    // messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [user_id, showInput]);
   useEffect(() => {
-
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [state.messages.length]);
 
   useEffect(() => {
@@ -120,8 +128,8 @@ export function ChatDisplay() {
   useEffect(() => {
     if (!state.selectedChat || !state.selectedChat.conversation_id) {
       // dispatch({ type: "SET_MESSAGES", payload: [] });
-      return
-    };
+      return;
+    }
     // console.log('fetching messages')
     (async () => {
       try {
@@ -267,7 +275,7 @@ export function ChatDisplay() {
                   There are no messages to be displayed
                 </p>
                 <Button
-                  className="border border-primary rounded-full tracking-wide shadow-xl shadow-primary transition duration-150 hover:scale-105 ease-in-out"
+                  className="border border-primary rounded-full tracking-wide shadow-xl shadow-primary transition duration-100 hover:scale-105 ease-in-out"
                   onClick={() => handleStartChat()}
                 >
                   Start a chat
@@ -278,37 +286,101 @@ export function ChatDisplay() {
             <React.Fragment>
               <div className="flex-grow"></div>
               {/* <div>hjhjvhv</div> */}
-              <ScrollArea className="h-scree mr-1 flex flex-col h- justify-end " >
-                <div className="flex flex-col flex-grow overflow-y-auto justify-end gap-3   whitespace-pre-wrap p-4 text-sm" >
+              <ScrollArea className="h-scree mr-1 flex flex-col h- justify-end ">
+                <div className="flex flex-col flex-grow overflow-y-auto justify-end gap-   whitespace-pre-wrap px-16 py-4 text-sm">
                   {/* <div className="flex-grow"/> */}
-                  {state.messages.map((message, index) => (
-                    <div
-                      key={message.message_id}
-                      className={`${
-                        user.user_id === message.sender_id
-                          ? "self-end border border-primary rounded-tr-none"
-                          : "self-start shadow-lg bg-secondary rounded-tl-none"
-                      } relative text-lef  max-w-full sm:max-w-[90%] md:max-w-[70%] break-words flex flex-col gap-1 w-auto px-2 pt-1 pb-1 rounded-xl `}
-                    >
-                      {/* <div className="flex"> */}
-                      <p
-                        className={`text-primary-${
-                          user.user_id === message.sender_id
-                            ? "background"
-                            : "background"
-                        } self-${user.user_id === message.sender_id ? "end" : "start"} text-base font-medium leading-  tracking-wide subpixel-antialiased`}
+                  {state.messages.map((message, index) => {
+                    const isSameSenderAsPrevious =
+                      index > 0 &&
+                      state.messages[index - 1].sender_id === message.sender_id;
+                    const isSameSenderAsNext =
+                      index < state.messages.length - 1 &&
+                      state.messages[index + 1].sender_id === message.sender_id;
+
+                    return (
+                      <div
+                        key={message.message_id}
+                        className={`${
+                          isSameSenderAsNext ? "mb-[2px]" : "mb-3"
+                        } w-full flex flex-col`}
                       >
-                        {message.content}
-                      </p>
-                      {/* <p className="pe-14 h-1"></p> */}
-                      {/* </div> */}
-                      <p className="text-muted-foreground text-xs leading3 tracking-tight self-end">
-                        {getTime(message.sender_id == user.user_id ? message.sent_at : message.received_at)}
-                      </p>
-                      {/* <div ref={index + 1 === state.messages.length ? messagesEndRef : null} ></div> */}
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} ></div>
+                        <div
+                          className={`${
+                            user.user_id === message.sender_id
+                              ? `self-end ${
+                                  !isSameSenderAsPrevious && !isSameSenderAsNext
+                                    ? "rounded-2xl"
+                                    : !isSameSenderAsPrevious &&
+                                      isSameSenderAsNext
+                                    ? "rounded-br-md rounded-tr-2xl rounded-tl-2xl rounded-bl-2xl"
+                                    : isSameSenderAsPrevious &&
+                                      !isSameSenderAsNext
+                                    ? "rounded-br-2xl rounded-tr-md rounded-tl-2xl rounded-bl-2xl"
+                                    : "rounded-br-md rounded-tr-md rounded-tl-2xl rounded-bl-2xl"
+                                }`
+                              : `self-start shadow-lg bg-secondary ${
+                                  !isSameSenderAsPrevious && !isSameSenderAsNext
+                                    ? "rounded-2xl"
+                                    : !isSameSenderAsPrevious &&
+                                      isSameSenderAsNext
+                                    ? "rounded-bl-md rounded-tr-2xl rounded-tl-2xl rounded-br-2xl"
+                                    : isSameSenderAsPrevious &&
+                                      !isSameSenderAsNext
+                                    ? "rounded-br-2xl rounded-tl-md rounded-tr-2xl rounded-bl-2xl"
+                                    : "rounded-bl-md rounded-tl-md rounded-tr-2xl rounded-br-2xl"
+                                }`
+                          } relative text-left bg-primary max-w-full sm:max-w-[90%] md:max-w-[70%] break-all flex flex-col gap-1 w-auto pt-2.5 px-3 pb-1.5 rounded-ful`}
+                        >
+                          {/* <div className="flex"> */}
+                          <p
+                            className={`text-primary-${
+                              user.user_id === message.sender_id
+                                ? "foreground"
+                                : "background"
+                            } self-${
+                              user.user_id === message.sender_id
+                                ? "end"
+                                : "start"
+                            } text-base font-mediu leading-none fle gap-3 tracking-wide subpixel-antialiased`}
+                          >
+                            {message.content}
+                            <span
+                              className={`text-primary-${
+                                user.user_id === message.sender_id
+                                  ? "foreground font-semibold"
+                                  : "background"
+                              } opacity-60 text-xs leading-none w-max float-right ml-4 mt-2 tracking-tight self-end justify-self-end`}
+                            >
+                              {getTime(
+                                message.sender_id == user.user_id
+                                  ? message.sent_at
+                                  : message.received_at
+                              )}
+                            </span>
+                          </p>
+                          {/* <p className="pe-14 h-1"></p> */}
+                          {/* </div> */}
+
+                          {/* <p
+                          className={`text-primary-${
+                            user.user_id === message.sender_id
+                              ? "foreground"
+                              : "background"
+                          } text-xs leading3 tracking-tight self-end`}
+                        >
+                          {getTime(
+                            message.sender_id == user.user_id
+                              ? message.sent_at
+                              : message.received_at
+                          )}
+                        </p> */}
+
+                          {/* <div ref={index + 1 === state.messages.length ? messagesEndRef : null} ></div> */}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div ref={messagesEndRef}></div>
                 </div>
                 <ScrollBar />
               </ScrollArea>

@@ -94,8 +94,8 @@ function NewChatDialog() {
         //   setNewChatLoading(false);
         // }, 1000);
         // setDialog(dialog === 1 ? 2 : 1);
-        setDialogOpen(false);
         navigate(`/t/${user_id}`);
+        setDialogOpen(false);
         // console.log(res.data);
       } catch (error) {
         console.error(error);
@@ -186,8 +186,8 @@ function NewChatDialog() {
       </Tooltip>
       {/* <NewChatDialogOpen/> */}
       <DialogContent className="sm:max-w-[500px] p-0">
-        <Tabs defaultValue="newchat" className="relative max-w-full">
-          <TabsList className="grid w-full grid-cols-2 absolute -top-12">
+        <Tabs defaultValue="newchat" className="relative max-w-full" onChange={() => console.log("done @@###")}>
+          <TabsList className="grid w-full grid-cols-2 absolute -top-12" >
             <TabsTrigger value="newchat">New Chat</TabsTrigger>
             <TabsTrigger value="newgroup">New Group</TabsTrigger>
           </TabsList>
